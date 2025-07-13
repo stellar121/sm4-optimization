@@ -1,6 +1,6 @@
-#Project1：SM4的软件实现和优化
+# Project1：SM4的软件实现和优化
 本项目旨在基于《20250707-sm4-public.pdf》文档中的技术细节，实现 SM4 分组密码算法的高效 C++ 版本，并逐步应用文档中提及的优化策略，包括 T-Table 合并变换、SIMD 指令加速及防缓存攻击等技术，最终达成高性能与安全性兼顾的实现目标。
-#算法基础
+# 算法基础
 SM4 是一种采用非平衡 Feistel 结构的分组密码，核心参数如下：分组长度：128 位密钥长度：128 位迭代轮数：32 轮核心变换：轮函数\(F(\cdot)\)、复合变换\(T(\cdot) = L(\tau(\cdot))\)非线性变换\(\tau(\cdot)\)：基于 S 盒的字节替换（文档第 31 页 S 盒定义）线性变换\(L(\cdot)\)：\(B \oplus (B \lll 2) \oplus (B \lll 10) \oplus (B \lll 18) \oplus (B \lll 24)\)
 #代码结构
 ├── src/                # 实现代码（按优化阶段划分）
@@ -15,12 +15,12 @@ SM4 是一种采用非平衡 Feistel 结构的分组密码，核心参数如下�
 │   ├── algo_principle.md  # 算法原理推导（文档第15页轮函数定义）
 │   └── optimization.md    # 优化策略说明（文档第21-27页技术细节）
 └── CMakeLists.txt      # 编译配置（支持多版本切换）
-#优化策略
+# 优化策略
 T-Table 方法
 预计算 4 个 8×32 位表，合并非线性变换\(\tau(\cdot)\)与线性变换\(L(\cdot)\)，将轮内计算简化为查表操作，消除 4 次循环移位开销，性能从 30.7 cycles/byte 提升至 19.9 cycles/byte。SIMD 指令加速（文档第 20-22 页）
 利用 128 位 SSE、256 位 AVX 或 512 位 AVX512 寄存器并行处理多分组，结合PSHUFB指令实现并行 S 盒替换，16 分组时性能可达 9.6 cycles/byte（AVX512 优化）。防缓存攻击（文档第 23-27 页）
 参考 OpenSSL 方案，首尾轮使用字节级 S 盒操作，中间轮保留 T-Table，确保内存访问模式与输入无关，平衡性能与抗侧信道攻击能力。
-#编译与使用
+# 编译与使用
 编译步骤bash# 克隆仓库
 git clone https://github.com/stellar121/sm4-optimization.git
 cd sm4-optimization
